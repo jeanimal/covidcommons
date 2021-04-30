@@ -25,5 +25,6 @@ covidImputed <- covidAddMadColumns(covidWeekly, "Cases")
 write.csv(covidImputed,"kaggle_imputed.csv", row.names = FALSE)
 ```
 
+# How and why
 
 Explanations of these cleaning functions with plots before and after are in this notebook: https://www.kaggle.com/jeanimal/covid-by-race-data-processing
