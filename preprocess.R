@@ -1,12 +1,5 @@
 library(tidyverse)
 
-fixCommasInNumbers <- function(covidByStateRaw, numericCols) {
-  x <- covidByStateRaw[,valCols]
-  y <- as.numeric(gsub(",","",x,fixed=TRUE))
-  covidByStateRaw[,valCols] <- y
-  
-}
-
 # Turn the many columns for Cases and Deaths into rows.
 pivotCasesAndDeaths <- function(covidByStateRaw) {
   keyCols <- c("Date", "State")
