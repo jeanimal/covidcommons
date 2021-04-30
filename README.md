@@ -18,11 +18,18 @@ source('~/Code/R/covidcommons/smoothOutlier.R')
 
 covidJoin <- pivotCasesAndDeaths(covidByStateRaw)
 
+# Clean n/a
 covidClean <- fillDownThenUp(covidJoin)
+
+# Make weekly according to the selected day of week.
+# (This data set had only Sundays and Wednesdays, and I picked Sunday.)
 covidWeekly <- selectWeekly(covidClean, "Sunday")
+
+# Smooth spikes with MAD for several windows.
+# This may take a few minutes.
 covidImputed <- covidAddMadColumns(covidWeekly, "Cases")
 
-write.csv(covidImputed,"kaggle_imputed.csv", row.names = FALSE)
+write.csv(covidImputed,"output/covid_imputed.csv", row.names = FALSE)
 ```
 
 # How and why
