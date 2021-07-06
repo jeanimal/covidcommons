@@ -25,7 +25,7 @@ covidClean <- fillDownThenUp(covidJoin)
 # (This data set had only Sundays and Wednesdays, and I picked Sunday.)
 covidWeekly <- selectWeekly(covidClean, "Sunday")
 
-# Smooth spikes with MAD for several windows.
+# Smooth spikes with MAD for several windows for Cases column.
 # This may take a few minutes.
 covidImputed <- covidAddMadColumns(covidWeekly, "Cases")
 
