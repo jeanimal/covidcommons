@@ -23,6 +23,29 @@ fillDownThenUp <- function(pivotedCovid) {
   covidClean
 }
 
+# The output of this funciton is a dataframe with no na's.
+# It achieves this in two ways.
+#
+# If a group (State, Race) has all cases na, the group will be filtered out.  Fewer rows.
+# If a group (State, Race) has all deaths na, the Deaths will be converted to 0's.
+fixGroupsAllNa <- function(pivotedCovid) {
+  pivotedCovid <- pivotedCovid %>% 
+    group_by(State, Race)  %>% 
+    filter(!all(is.na(Cases)))
+  pivotedCovid <- pivotedCovid %>%
+    mutate(Deaths = ifelse(is.na(Deaths), 0, Deaths))
+}
+
+# Use monotonic regression to prevent total number of Cases/Deaths from going down.
+# Monotonic regression will error on missing values so they must be cleaned first.
+replaceWithMonoticRegression <- function(pivotedCovid) {
+  pivotedCovid <- pivotedCovid %>%
+    group_by(State, Race) %>%
+    mutate(Cases = isoreg(Date, Cases)$yf) %>%
+    mutate(Deaths = isoreg(Date, Deaths)$yf) %>%
+    distinct(Date, .keep_all=TRUE)
+}
+
 selectWeekly <- function(pivotedCovid, dayOfWeek) {
   covidDay <- pivotedCovid
   covidDay[["DateAsDate"]] <- as.Date(as.character(covidDay[["Date"]]), "%Y%m%d")

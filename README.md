@@ -18,8 +18,15 @@ source('~/Code/R/covidcommons/smoothOutlier.R')
 
 covidJoin <- pivotCasesAndDeaths(covidByStateRaw)
 
-# Clean n/a
+# Clean n/a's at the beginning and end of the data by filling.
 covidClean <- fillDownThenUp(covidJoin)
+
+# If a group (State, Race) is all na, then either remove or fill in 0's.
+covidClean <- fixGroupsAllNa(covidClean)
+# If a group (State, Race) has totals that go down, replace with monotonic regression.
+# See https://stat.ethz.ch/R-manual/R-devel/library/stats/html/isoreg.html
+# (Non-decreasing totals insure that "new cases" and "new deaths" are never negative.)
+covidClean <- replaceWithMonoticRegression(covidClean)
 
 # Make weekly according to the selected day of week.
 # (This data set had only Sundays and Wednesdays, and I picked Sunday.)
