@@ -40,7 +40,11 @@ covidSunday <- selectWeekly(covidClean, "Sunday")
 # Add columns for new cases and deaths (better for modeling.)
 covidSunday <- calcNewCasesAndDeaths(covidSunday)
 
-write.csv(covidSunday,"output/covid_tracker.csv", row.names = FALSE)
+# The first row of every state / race has NA for NewCases and NewDeaths because
+# they are a difference from a previous row and these have no previous row.  Remove those.
+covidSundayClean <- covidSundayLagged[complete.cases(covidSunday), ]
+
+write.csv(covidSundayClean,"output/covid_tracker.csv", row.names = FALSE)
 
 # If you want to smooth spikes with MAD for several windows, use the function below.
 # This may take a few minutes to run.
@@ -63,7 +67,7 @@ covidSundayLagged <- covidSunday %>%
         k          = lagRange,
         col_rename = col_names
     )
-write.csv(covidImputed,"output/covid_tracker_lagged.csv", row.names = FALSE)
+write.csv(covidLaggedClean,"output/covid_tracker_lagged.csv", row.names = FALSE)
 ```
 
 # How and why
