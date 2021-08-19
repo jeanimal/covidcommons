@@ -6,6 +6,7 @@ Process and analyze data for the Chicagoland covid commons project.
 ```
 library(tidyverse)
 library(tidyquant)
+library(zoo) # For interpolating na.
 
 source('~/Code/R/covidcommons/preprocess.R')
 source('~/Code/R/covidcommons/smoothOutlier.R')
@@ -18,11 +19,15 @@ covidByStateRaw <- read_csv(url, col_types = cols(
 
 covidJoin <- pivotCasesAndDeaths(covidByStateRaw)
 
-# Clean n/a's at the beginning and end of the data by filling.
-covidClean <- fillDownThenUp(covidJoin)
+# Clean n/a's in the middle of a time series by interpolating..
+covidClean <- interpolateNa(covidJoin)
 
-# If a group (State, Race) is all na, then either remove or fill in 0's.
+# Clean n/a's at the beginning and end of the data by filling (repeating) up or down.
+covidClean <- fillDownThenUpNa(covidClean)
+
+# If a group (State, Race) is all na for cases, then remove.  For Deaths, fill in 0's.
 covidClean <- fixGroupsAllNa(covidClean)
+
 # If a group (State, Race) has totals that go down, replace with monotonic regression.
 # See https://stat.ethz.ch/R-manual/R-devel/library/stats/html/isoreg.html
 # (Non-decreasing totals insure that "new cases" and "new deaths" are never negative.)
@@ -30,15 +35,35 @@ covidClean <- replaceWithMonoticRegression(covidClean)
 
 # Make weekly according to the selected day of week.
 # (This data set had only Sundays and Wednesdays, and I picked Sunday.)
-covidWeekly <- selectWeekly(covidClean, "Sunday")
+covidSunday <- selectWeekly(covidClean, "Sunday")
 
-# Smooth spikes with MAD for several windows.
+# Add columns for new cases and deaths (better for modeling.)
+covidSunday <- calcNewCasesAndDeaths(covidSunday)
+
+write.csv(covidSunday,"output/covid_tracker.csv", row.names = FALSE)
+
+# If you want to smooth spikes with MAD for several windows, use the function below.
 # This may take a few minutes to run.
-covidImputed <- covidWeekly
-covidImputed <- covidAddMadColumns(covidImputed, "Cases")
-covidImputed <- covidAddMadColumns(covidImputed, "Deaths")
+# covidImputed <- covidSunday
+# covidImputed <- covidAddMadColumns(covidImputed, "Cases")
+# covidImputed <- covidAddMadColumns(covidImputed, "Deaths")
+# write.csv(covidImputed,"output/covid_tracker_imputed.csv", row.names = FALSE)
 
-write.csv(covidImputed,"output/covid_tracker_imputed.csv", row.names = FALSE)
+# If you want to add weekly lags... (but without imputed data)
+
+lagRange <- 1:8
+col_names <- paste0("NewCases_Lag_", lagRange)
+
+covidSundayLagged <- covidSunday %>%
+  group_by(State, Race) %>%
+  arrange(Date) %>%
+    tq_mutate(
+        select     = NewCases,
+        mutate_fun = lag.xts,
+        k          = lagRange,
+        col_rename = col_names
+    )
+write.csv(covidImputed,"output/covid_tracker_lagged.csv", row.names = FALSE)
 ```
 
 # How and why
