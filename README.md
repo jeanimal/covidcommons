@@ -56,6 +56,7 @@ write.csv(covidSundayClean,"output/covid_tracker.csv", row.names = FALSE)
 # write.csv(covidImputed,"output/covid_tracker_imputed.csv", row.names = FALSE)
 
 # If you want to add weekly lags... (but without imputed data)
+# These are used for modelers to link deaths to recently-detected covid cases.
 
 lagRange <- 1:8
 col_names <- paste0("NewCases_Lag_", lagRange)
