@@ -5,7 +5,7 @@ Process and analyze data for the Chicagoland covid commons project.
 
 ```
 library(tidyverse)
-library(tidyquant)
+library(tidyquant) # For imputing outliers with MAD hampel filter.
 library(zoo) # For interpolating na.
 
 source('~/Code/R/covidcommons/preprocess.R')
