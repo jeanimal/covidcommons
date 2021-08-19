@@ -46,9 +46,11 @@ covidSundayClean <- covidSundayLagged[complete.cases(covidSunday), ]
 
 write.csv(covidSundayClean,"output/covid_tracker.csv", row.names = FALSE)
 
+#### Optional additional processing ###
+
 # If you want to smooth spikes with MAD for several windows, use the function below.
 # This may take a few minutes to run.
-# covidImputed <- covidSunday
+# covidImputed <- covidSundayClean
 # covidImputed <- covidAddMadColumns(covidImputed, "Cases")
 # covidImputed <- covidAddMadColumns(covidImputed, "Deaths")
 # write.csv(covidImputed,"output/covid_tracker_imputed.csv", row.names = FALSE)
@@ -58,7 +60,7 @@ write.csv(covidSundayClean,"output/covid_tracker.csv", row.names = FALSE)
 lagRange <- 1:8
 col_names <- paste0("NewCases_Lag_", lagRange)
 
-covidSundayLagged <- covidSunday %>%
+covidLagged <- covidSundayClean %>%
   group_by(State, Race) %>%
   arrange(Date) %>%
     tq_mutate(
@@ -67,7 +69,7 @@ covidSundayLagged <- covidSunday %>%
         k          = lagRange,
         col_rename = col_names
     )
-write.csv(covidLaggedClean,"output/covid_tracker_lagged.csv", row.names = FALSE)
+write.csv(covidLagged,"output/covid_tracker_lagged.csv", row.names = FALSE)
 ```
 
 # How and why
