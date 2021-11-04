@@ -1,6 +1,15 @@
 # covidcommons
 Process and analyze data for the Chicagoland covid commons project.
 
+The data comes from covid tracker, which stopped updating in March 2021.  The main dependent variables are:
+- Cases (total number of cases of covid by that date)
+- Deaths (total number of deaths attributed to covid by that date)
+
+Note that states have different ways of tracking everything:
+- race / ethnicity (whether they use latinx)
+- what counts as "covid" (based on symptoms only or requiring a test)
+- what counts as a "covid death" (in community, in hospital, 30 days after release, etc.)
+
 ## Example usage
 
 ```
@@ -42,7 +51,7 @@ covidSunday <- calcNewCasesAndDeaths(covidSunday)
 
 # The first row of every state / race has NA for NewCases and NewDeaths because
 # they are a difference from a previous row and these have no previous row.  Remove those.
-covidSundayClean <- covidSundayLagged[complete.cases(covidSunday), ]
+covidSundayClean <- covidSunday[complete.cases(covidSunday), ]
 
 write.csv(covidSundayClean,"output/covid_tracker.csv", row.names = FALSE)
 
