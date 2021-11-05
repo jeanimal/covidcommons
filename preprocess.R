@@ -73,7 +73,7 @@ selectWeekly <- function(pivotedCovid, dayOfWeek) {
 # Modeling is more easily done on immediate effects.
 # So let's calculate how many new cases or new deaths occurred since the previous week.
 calcNewCasesAndDeaths <- function(pivotedCovid) {
-  covidLagged <- covidImputed %>%
+  covidLagged <- pivotedCovid %>%
     group_by(State, Race) %>%
     arrange(Date, .by_group = TRUE) %>%
     mutate(PrevDate = lag(Date), PrevCases = lag(Cases), PrevDeaths = lag(Deaths))
