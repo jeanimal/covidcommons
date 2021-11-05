@@ -69,7 +69,9 @@ selectWeekly <- function(pivotedCovid, dayOfWeek) {
   covidWeekly
 }
 
-# A cumulative count drags a lot of past history with it. 
+# Add columns for new cases and deaths.
+#
+# Why? A cumulative count drags a lot of past history with it. 
 # Modeling is more easily done on immediate effects.
 # So let's calculate how many new cases or new deaths occurred since the previous week.
 calcNewCasesAndDeaths <- function(pivotedCovid) {
